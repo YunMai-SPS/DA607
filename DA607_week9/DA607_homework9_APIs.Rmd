@@ -1,0 +1,416 @@
+---
+title: "DATA607_week9_API"
+author: "Yun Mai"
+date: "April 2, 2017"
+output: github_document
+---
+
+```{}
+install.packages(c("digest", "evaluate", "formatR", "highlight", "knitr", 
+  "parser", "plyr", "Rcpp", "stringr"))
+install.packages(c("httr", "RCurl", "XML", "dplyr", "data.table"))
+install.packages("rmarkdown", repos = "https://cran.revolutionanalytics.com")
+install.packages("ggplot2")
+```
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Web APIs
+
+Assignment:
+The New York Times web site provides a rich set of APIs, as described here: http://developer.nytimes.com/docs
+
+You'll need to start by signing up for an API key.
+
+Your task is to choose one of the New York Times APIs, construct an interface in R to read in the JSON data, and transform it to an R dataframe.
+
+Load packages
+```{r}
+library(httr)
+library(RCurl)
+library(XML)
+library(dplyr)
+library(stringr)
+library(knitr)
+library(jsonlite)
+library(data.table)
+library(ggplot2)
+```
+
+**The New York Times Developer Network**
+
+All the APIs Fit to POST
+
+You already know that NYTimes.com is an unparalleled source of news and information. But now it's a premier source of data, too - why just read the news when you can hack it?
+I will use New York Times TOP Stories API to create a interface in R. 
+
+**Top Stories API**
+
+The Top Stories API returns lists of articles and associated images that are currently on the specified section front. The API supports JSON and JSONP.
+
+Note: In this document, curly braces { } indicate required items. Square brackets [ ] indicate optional items or placeholders.
+
+To use the Top Stories API, you must sign up for an API key. 
+
+Usage is limited to 1,000 requests per day (rate limits are subject to change),and 5 calls per second.
+
+Sample format of an xml request:
+http://api.nytimes.com/svc/topstories/v2/{section}.{response-format}?api-key={your-api-key}
+
+Parameters included in the Top Stories API xml format call are shown as following:
+```{r, echo = F}
+df_TSparameter <- data.frame(Parameter = c("section", "response-format", "api-key"), Value = c("The section name(home, arts, automobiles, books, business, fashion, food, health, insider, magazine, movies, national, nyregion, obituaries, opinion, politics, realestate, science, sports, sundayreview, technology, theater, tmagazine, travel, upshot, and world)", "json or jsonp", "Your API key"))
+
+# The TOP Stories includes different sections: home, arts, automobiles, books, business, fashion, food, health, insider, magazine, movies, national, nyregion, obituaries, opinion, politics, realestate, science, sports, sundayreview, technology, theater, tmagazine, travel, upshot, and world. 
+
+kable(df_TSparameter)
+```
+
+```{r,echo=F}
+nyt_topstories_api <- "1c26bbdea0dc4878a943d80b674bfdee"
+```
+
+Get top stories from the business section
+```{r}
+url_b1 <- "http://api.nytimes.com/svc/topstories/v2/business.json"
+url_b2 <- paste0(url_b1, "?api-key=", nyt_topstories_api)
+response <- GET(url = url_b2)
+```
+
+The response looks like this.
+```{r, echo = F}
+response[1] <- gsub("1c26bbdea0dc4878a943d80b674bfdee","##",response[1])
+response
+```
+
+Get the JSON file
+```{r}
+#download URL on the business section
+fetch_TS_b <- getURL(url_b2)
+show <- str_sub(fetch_TS_b, 1, 300) 
+show
+```
+
+Parse JSON data and generate a data frame for the top business stories.
+```{r}
+# Parse the JSON data with the fromJSON function. Under the rule of jsonlite, fromJSON function should map JSOn data into a data frame. It turned out to be a list.
+parsed.business <- fromJSON(fetch_TS_b)
+# conver to data frame
+df_p_bu <- data.frame(parsed.business)
+# show all variables
+colnames_df_p_bu <- colnames(df_p_bu)
+# rename some of the column names
+colnames_df_p_bu_n <- str_replace(colnames_df_p_bu,"results\\.","")
+colnames(df_p_bu) <- colnames_df_p_bu_n
+```
+
+Subset to select the variables intrested.
+```{r}
+vars <- c("section", "num_results", "section", "subsection", "published_date", "title", "abstract", "url", "byline", "item_type", "published_date", "short_url")
+TS_business <- df_p_bu[vars]
+kable(head(TS_business))
+```
+
+Get top stories from the science section
+```{r}
+url_s1 <- "http://api.nytimes.com/svc/topstories/v2/science.json"
+url_s2 <- paste0(url_s1, "?api-key=", nyt_topstories_api)
+
+#download URL on the science section
+fetch_TS_s <- getURL(url_s2)
+
+#Parse the JSON data
+parsed.science <- fromJSON(fetch_TS_s)
+# conver to data frame
+df_p_sc <- data.frame(parsed.science)
+# show all variables
+colnames_df_p_sc <- colnames(df_p_sc)
+# rename some of the column names
+colnames_df_p_sc_n <- str_replace(colnames_df_p_sc,"results\\.","")
+colnames(df_p_sc) <- colnames_df_p_sc_n
+
+#subset the variables interested
+TS_science <- df_p_sc[vars]
+kable(head(TS_science))
+```
+
+
+
+Get top stories from the technology section
+```{r}
+url_t1 <- "http://api.nytimes.com/svc/topstories/v2/technology.json"
+url_t2 <- paste0(url_t1, "?api-key=", nyt_topstories_api)
+
+#download URL on the technology section
+fetch_TS_t <- getURL(url_t2)
+
+#Parse the JSON data
+parsed.technology <- fromJSON(fetch_TS_t)
+# conver to data frame
+df_p_te <- data.frame(parsed.technology)
+# show all variables
+colnames_df_p_te <- colnames(df_p_te)
+# rename some of the column names
+colnames_df_p_te_n <- str_replace(colnames_df_p_te,"results\\.","")
+colnames(df_p_te) <- colnames_df_p_te_n
+
+#subset the variables interested
+TS_technology <- df_p_te[vars]
+kable(head(TS_technology))
+```
+
+Get top stories from the health section
+```{r}
+url_h1 <- "http://api.nytimes.com/svc/topstories/v2/health.json"
+url_h2 <- paste0(url_h1, "?api-key=", nyt_topstories_api)
+
+#download URL on the health section
+fetch_TS_h <- getURL(url_h2)
+
+#Parse the JSON data
+parsed.health  <- fromJSON(fetch_TS_h)
+# conver to data frame
+df_p_he <- data.frame(parsed.health)
+# show all variables
+colnames_df_p_he <- colnames(df_p_he)
+# rename some of the column names
+colnames_df_p_he_n <- str_replace(colnames_df_p_he,"results\\.","")
+colnames(df_p_he) <- colnames_df_p_he_n
+
+#subset the variables interested
+TS_health <- df_p_he[vars]
+kable(head(TS_health))
+```
+
+Get top stories from the arts section
+```{r}
+url_a1 <- "http://api.nytimes.com/svc/topstories/v2/arts.json"
+url_a2 <- paste0(url_a1, "?api-key=", nyt_topstories_api)
+
+#download URL on the technology section
+fetch_TS_a <- getURL(url_a2)
+
+#Parse the JSON data
+parsed.arts <- fromJSON(fetch_TS_a)
+# conver to data frame
+df_p_ar <- data.frame(parsed.arts)
+# show all variables
+colnames_df_p_ar <- colnames(df_p_ar)
+# rename some of the column names
+colnames_df_p_ar_n <- str_replace(colnames_df_p_ar,"results\\.","")
+colnames(df_p_ar) <- colnames_df_p_ar_n
+
+#subset the variables interested
+TS_arts <- df_p_ar[vars]
+kable(head(TS_arts))
+```
+
+
+Get top stories from the politics section
+```{r}
+url_p1 <- "http://api.nytimes.com/svc/topstories/v2/politics.json"
+url_p2 <- paste0(url_p1, "?api-key=", nyt_topstories_api)
+
+#download URL on the politics section
+fetch_TS_p <- getURL(url_p2)
+
+#Parse the JSON data
+parsed.politics <- fromJSON(fetch_TS_p)
+# conver to data frame
+df_p_po <- data.frame(parsed.politics)
+# show all variables
+colnames_df_p_po <- colnames(df_p_po)
+# rename some of the column names
+colnames_df_p_po_n <- str_replace(colnames_df_p_po,"results\\.","")
+colnames(df_p_po) <- colnames_df_p_po_n
+
+#subset the variables interested
+TS_politics <- df_p_po[vars]
+kable(head(TS_politics))
+```
+
+Get top stories from the world section
+```{r}
+url_w1 <- "http://api.nytimes.com/svc/topstories/v2/world.json"
+url_w2 <- paste0(url_w1, "?api-key=", nyt_topstories_api)
+
+#download URL on the world section
+fetch_TS_w <- getURL(url_w2)
+
+#Parse the JSON data
+parsed.world <- fromJSON(fetch_TS_w)
+# conver to data frame
+df_p_wo <- data.frame(parsed.world)
+# show all variables
+colnames_df_p_wo <- colnames(df_p_wo)
+# rename some of the column names
+colnames_df_p_wo_n <- str_replace(colnames_df_p_wo,"results\\.","")
+colnames(df_p_wo) <- colnames_df_p_wo_n
+
+#subset the variables interested
+TS_world <- df_p_wo[vars]
+kable(head(TS_world))
+```
+
+
+Get top stories from the national section
+```{r}
+url_n1 <- "http://api.nytimes.com/svc/topstories/v2/national.json"
+url_n2 <- paste0(url_n1, "?api-key=", nyt_topstories_api)
+
+#download URL on the national section
+fetch_TS_n <- getURL(url_n2)
+
+#Parse the JSON data
+parsed.national <- fromJSON(fetch_TS_n)
+# conver to data frame
+df_p_na <- data.frame(parsed.national)
+# show all variables
+colnames_df_p_na <- colnames(df_p_na)
+# rename some of the column names
+colnames_df_p_na_n <- str_replace(colnames_df_p_na,"results\\.","")
+colnames(df_p_na) <- colnames_df_p_na_n
+
+#subset the variables interested
+vars_na <- c("section", "last_updated", "num_results", "section", "subsection", "title", "abstract", "url", "byline", "item_type", "published_date", "short_url")
+TS_national <- df_p_na[vars_na]
+kable(head(TS_national))
+```
+
+Get top stories from the nyregion section
+```{r}
+url_y1 <- "http://api.nytimes.com/svc/topstories/v2/nyregion.json"
+url_y2 <- paste0(url_y1, "?api-key=", nyt_topstories_api)
+
+#download URL on the nyregion section
+fetch_TS_y <- getURL(url_y2)
+
+#Parse the JSON data
+parsed.nyregion <- fromJSON(fetch_TS_y)
+# conver to data frame
+df_p_ny <- data.frame(parsed.nyregion)
+# show all variables
+colnames_df_p_ny <- colnames(df_p_ny)
+# rename some of the column names
+colnames_df_p_ny_n <- str_replace(colnames_df_p_ny,"results\\.","")
+colnames(df_p_ny) <- colnames_df_p_ny_n
+
+#subset the variables interested
+TS_nyregion <- df_p_ny[vars]
+kable(head(TS_nyregion))
+```
+
+Get top stories from the theater section
+```{r}
+url_th1 <- "http://api.nytimes.com/svc/topstories/v2/theater.json"
+url_th2 <- paste0(url_th1, "?api-key=", nyt_topstories_api)
+
+#download URL on the theater section
+fetch_TS_th <- getURL(url_th2)
+
+#Parse the JSON data
+parsed.theater <- fromJSON(fetch_TS_th)
+# conver to data frame
+df_p_th <- data.frame(parsed.theater)
+# show all variables
+colnames_df_p_th <- colnames(df_p_th)
+# rename some of the column names
+colnames_df_p_th_n <- str_replace(colnames_df_p_th,"results\\.","")
+colnames(df_p_th) <- colnames_df_p_th_n
+
+#subset the variables interested
+TS_theater <- df_p_th[vars]
+kable(head(TS_theater))
+```
+
+Get top stories from the sports section
+```{r}
+url_sp1 <- "http://api.nytimes.com/svc/topstories/v2/sports.json"
+url_sp2 <- paste0(url_sp1, "?api-key=", nyt_topstories_api)
+
+#download URL on the sports section
+fetch_TS_sp <- getURL(url_sp2)
+
+#Parse the JSON data
+parsed.sports <- fromJSON(fetch_TS_sp)
+# conver to data frame
+df_p_sp <- data.frame(parsed.sports)
+# show all variables
+colnames_df_p_sp <- colnames(df_p_sp)
+# rename some of the column names
+colnames_df_p_sp_n <- str_replace(colnames_df_p_sp,"results\\.","")
+colnames(df_p_sp) <- colnames_df_p_sp_n
+
+#subset the variables interested
+TS_sports <- df_p_sp[vars]
+kable(head(TS_sports))
+```
+
+Get top stories from the sports section
+```{r}
+url_fs1 <- "http://api.nytimes.com/svc/topstories/v2/fashion.json"
+url_fs2 <- paste0(url_fs1, "?api-key=", nyt_topstories_api)
+
+#download URL on the sports section
+fetch_TS_fs <- getURL(url_fs2)
+
+#Parse the JSON data
+parsed.fashion <- fromJSON(fetch_TS_fs)
+# conver to data frame
+df_p_fs <- data.frame(parsed.fashion)
+# show all variables
+colnames_df_p_fs <- colnames(df_p_fs)
+# rename some of the column names
+colnames_df_p_fs_n <- str_replace(colnames_df_p_fs,"results\\.","")
+colnames(df_p_fs) <- colnames_df_p_fs_n
+
+#subset the variables interested
+TS_fashion <- df_p_fs[vars]
+kable(head(TS_fashion))
+```
+
+Get top stories from the home section
+```{r}
+url_hm1 <- "http://api.nytimes.com/svc/topstories/v2/home.json"
+url_hm2 <- paste0(url_hm1, "?api-key=", nyt_topstories_api)
+
+#download URL on the sports section
+fetch_TS_hm <- getURL(url_hm2)
+
+#Parse the JSON data
+parsed.home <- fromJSON(fetch_TS_hm)
+# conver to data frame
+df_p_hm <- data.frame(parsed.home)
+# show all variables
+colnames_df_p_hm <- colnames(df_p_hm)
+# rename some of the column names
+colnames_df_p_hm_n <- str_replace(colnames_df_p_hm,"results\\.","")
+colnames(df_p_hm) <- colnames_df_p_hm_n
+
+#subset the variables interested
+TS_home <- df_p_hm[vars]
+kable(head(TS_home))
+```
+
+```{r}
+stat_va <- c("section", "num_results")
+section_number <- rbind(TS_business[1,stat_va], TS_science[1,stat_va], TS_technology[1,stat_va], TS_health[1,stat_va], TS_politics[1,stat_va], TS_world[1,stat_va], TS_national[1,stat_va], TS_nyregion[1,stat_va], TS_arts[1,stat_va], TS_theater[1,stat_va], TS_fashion[1,stat_va], TS_sports[1,stat_va],TS_home[1,stat_va])
+```
+
+```{r}
+ggplot(data=section_number,aes(section, num_results, fill = section)) +
+  geom_bar(stat="identity", position = "stack") +
+  theme(legend.position = "none") + 
+  ggtitle("Top Stories of NY Times Articles by Section") +
+  xlab("Section") + ylab("Number of articles") +
+  geom_text(aes(label=num_results), vjust=0.5, hjust=0.8,color="black")+
+  theme(axis.text.x=element_text(angle=45, hjust=1))
+```
+
+
+From the distribution of different topics of top stories, we could know the targeted audience of New Yok Times. In the 11 sections I chose, arts is New York Times's favorite topic for top story. Technology, business, health, fashion and home are five popular topics. science, politics, theater, and sports are less popular than the former 6 sections. It is not known how popular book and movie are because the data is not available, showing error type 403 when trying to get info from NYT top stories API. Local and world news contributes the least to the top stories.
+
+
+
