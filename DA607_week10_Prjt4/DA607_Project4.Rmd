@@ -1,0 +1,357 @@
+---
+title: "DA607_week10_Dopcument Classification"
+author: "Yun Mai"
+date: "April 14, 2017"
+output: github_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## Document Classification
+
+It can be useful to be able to classify new "test" documents using already classified "training" documents.  A common example is using a corpus of labeled spam and ham (non-spam) e-mails to predict whether or not a new document is spam.  
+
+For this project, you can start with a spam/ham dataset, then predict the class of new documents (either withheld from the training dataset or from another source such as your own spam folder).   One example corpus:  https://spamassassin.apache.org/publiccorpus/
+
+```{}
+install.packages("RTextTools")
+install.packages("SnowballC")
+install.packages("vcd")
+install.packages("topicmodels")
+```
+
+```{r}
+options(repos="https://cran.rstudio.com" )
+library(RCurl)
+library(stringr)
+library(tm)
+library(RTextTools) 
+library(SnowballC)
+library(knitr)
+library(ggplot2)
+library(tidyr)
+update.packages("tm",  checkBuilt = TRUE)
+```
+
+```{r}
+if(!file.exists("easy_ham")) dir.create("easy_ham")
+download.file(url = "http://spamassassin.apache.org/old/publiccorpus/20021010_easy_ham.tar.bz2", destfile = "20021010_easy_ham.tar.bz2")
+untar("20021010_easy_ham.tar.bz2")
+
+if(!file.exists("hard_ham")) dir.create("hard_ham")
+download.file(url = "http://spamassassin.apache.org/old/publiccorpus/20021010_hard_ham.tar.bz2", destfile = "20021010_hard_ham.tar.bz2")
+untar("20021010_hard_ham.tar.bz2")
+
+if(!file.exists("spam")) dir.create("spam")
+download.file(url = "http://spamassassin.apache.org/old/publiccorpus/20021010_spam.tar.bz2", destfile = "20021010_spam.tar.bz2")
+untar("20021010_spam.tar.bz2")
+```
+
+## Document the emails in a structured table
+```{r}
+easy_ham <- list.files(path="easy_ham/", full.names=T, recursive=F)
+hard_ham <- list.files(path="hard_ham/", full.names=T, recursive=F)
+spam <- list.files(path="spam/", full.names=T, recursive=F)
+```
+
+## Test: setting corpus
+
+```{r}
+tmp <- readLines(easy_ham[1])
+tmp <- str_c(tmp, collapse = "")
+ham.corpus <- VCorpus(VectorSource(tmp))
+ham.corpus
+```
+
+## Test: Add meta information
+
+Email type (ham or spam), subject, sender will be added to the meta data.
+```{r}
+meta(ham.corpus[[1]], "type",  type = "corpus") <- "Ham" 
+meta(ham.corpus[[1]], "subject") <- unlist((str_extract_all(readLines(easy_ham[1]), "^Subject\\:.+")))
+meta(ham.corpus[[1]], "From") <- unlist((str_extract_all(readLines(easy_ham[1]), "^From\\:.+")))
+meta(ham.corpus[[1]], type = "corpus")
+```
+
+
+## Creat the corpus for analysis
+
+** easy_ham **
+
+```{r}
+ 
+n <- 1
+for (i in 2:length(easy_ham)){
+  tmp <- readLines(easy_ham[i])
+  tmp <- str_c(tmp, collapse = "")
+  # remove whitespace
+  tmp <- str_trim(unlist(str_replace_all(tmp,"\\s+"," ")))   
+  if (length(easy_ham)!=0) {
+    tmp.corpus <- VCorpus(VectorSource(tmp))
+    ham.corpus <- c(ham.corpus,tmp.corpus)
+    n <- n+1
+    meta(ham.corpus[[n]], "type",  type = "corpus") <- "Ham"
+    meta(ham.corpus[[n]], "subject") <- unlist((str_extract_all(readLines(easy_ham[i]), "^Subject\\:.+")))
+    meta(ham.corpus[[n]], "From") <- unlist((str_extract_all(readLines(easy_ham[i]), "^From\\:.+")))
+    }
+}
+```
+
+
+**add hard_ham **
+```{r}
+k <- length(easy_ham)
+for (i in 1:length(hard_ham)){
+  tmp <- readLines(hard_ham[i])
+  tmp <- str_c(tmp, collapse = "")
+  
+  if (length(hard_ham)!=0) {
+    tmp.corpus <- VCorpus(VectorSource(tmp))
+    ham.corpus <- c(ham.corpus,tmp.corpus)
+    k <- k+1
+    meta(ham.corpus[[k]], "type",  type = "corpus") <- "Ham"
+    meta(ham.corpus[[k]], "subject") <- unlist((str_extract_all(readLines(hard_ham[i]), "^Subject\\:.+")))
+    meta(ham.corpus[[k]], "From") <- unlist((str_extract_all(readLines(hard_ham[i]), "^From\\:.+")))
+    }
+}
+```
+
+The first file in spam folder is not a normal email file but a directory. We will need to remove this kind of abnormal file before genearte corpus. Since each email must have at least a receipient, there will be at least one string starting with "To". Abnormal file with no text starting with "To" will be not be considered as email and will be dropped.
+
+```{r}
+length(spam)
+```
+
+```{r}
+for (i in 1:length(spam)){
+    tmp <- data.frame(readLines(spam[i]))
+    if (sum(str_count(tmp[,1], "^To")) == 0 ){
+      file.remove(spam[i])
+    }
+}
+spam <- list.files(path="spam/", full.names=T, recursive=F)
+length(spam)
+```
+
+**spam **
+
+```{r}
+# read all of files from spam to generate spam corpus
+n <- 0
+for (i in 1:length(spam)){
+  tmp <- readLines(spam[i])
+  tmp <- str_c(tmp, collapse = "")
+  tmp.corpus <- VCorpus(VectorSource(tmp))
+  ifelse (!exists('spam.corpus'), 
+           spam.corpus <- tmp.corpus,
+           spam.corpus <- c(spam.corpus,tmp.corpus))
+    n <- n+1
+    meta(spam.corpus[[n]], "type",  type = "corpus") <- "Spam"
+    meta(spam.corpus[[n]], "subject") <- unlist((str_extract_all(readLines(spam[i]), "^Subject\\:.+")))
+    meta(spam.corpus[[n]], "From") <- unlist((str_extract_all(readLines(spam[i]), "^From\\:.+")))
+}
+```
+
+```{r}
+# combind ham and spam corpus and shuffle the files
+mix.corpus <- c(ham.corpus, spam.corpus)
+set.seed(123)
+mix.corpus <- sample(mix.corpus, length(mix.corpus))
+```
+
+
+```{r}
+# meta data
+meta(mix.corpus[[1]], type = "corpus")
+```
+
+
+```{r}
+#  text content
+mix.corpus[[1]]$content
+```
+
+```
+Corpuses need to be cleaned for further analysis.
+```
+
+## Clean the data
+```{r}
+# remove numbers, puctuation characters, stopwords, uppercase, and sparse terms and reduce words to their stem in the term-document matrix. 
+mix.corpus <- tm_map(mix.corpus, content_transformer(removeNumbers)) %>% 
+  tm_map(content_transformer(removePunctuation)) %>% 
+  tm_map(removeWords, words = stopwords(kind = "en")) %>% 
+  tm_map(content_transformer(tolower)) %>% 
+  tm_map(content_transformer(stemDocument)) 
+```
+
+## Build the model
+
+To Build the model, first we need to Create a document-term matrix. Second we need to create a container. At last we fill the container with the machine learning algorithm.
+
+** 1. Create a document-term matrix **
+
+```{r}
+dtm_mix <- DocumentTermMatrix(mix.corpus)
+dtm_mix
+```
+
+```{r}
+dtm_mix <- removeSparseTerms(dtm_mix, 1-(10/length(mix.corpus)))
+dtm_mix
+```
+
+
+** 2 .Create a container**
+
+```{r}
+# extract meta tag "type" 
+classify_labels <- as.vector(unlist(meta(mix.corpus, "type")))
+classify_labels <- as.data.frame(classify_labels)
+
+# set up model container; 50/50 split between train and test data
+N <- length(classify_labels[,1])
+container <- create_container(
+  dtm_mix, 
+  labels = classify_labels[,1],
+  trainSize = 1: round(0.5 * N),
+  testSize = (round(0.5 * N)+1) : N,
+  virgin = FALSE)
+
+# view the slot of the container
+slotNames(container)
+```
+
+** 3. Creat model by filling the container with the machine learning algorithm.**
+
+```{r}
+svm_model <- train_model(container, "SVM")
+tree_model <- train_model(container,"TREE")
+maxent_model <- train_model(container, "MAXENT")
+```
+
+
+** Estimation and Evaluation**
+
+**1. Model output**
+
+```{r}
+svm_out <- classify_model(container, svm_model)
+tree_out <- classify_model(container, tree_model)
+maxent_out <- classify_model(container, maxent_model)
+
+labels_out <- data.frame(
+correct_label = classify_labels[(round(0.5 * N)+1) : N,1],
+svm = as.character(svm_out[,1]),
+tree = as.character(tree_out[,1]),
+maxent = as.character(maxent_out[,1]),
+stringsAsFactors = F)
+kable(head(labels_out,10))
+```
+
+**2. Model Performance**
+
+The accuracy of each models was evaluated.
+```{r}
+# SVM performance**
+svm_table <- table(labels_out[,1] == labels_out[,2])
+svm_prop <- round(prop.table(svm_table), 4)
+
+# Random forest performance **
+tree_table <- table(labels_out[,1] == labels_out[,3])
+tree_prop <- round(prop.table(tree_table), 4)
+
+# Maximum entropy performance**
+maxent_table <- table(labels_out[,1] == labels_out[,4])
+maxent_prop <- round(prop.table(maxent_table),4)
+
+performance <- rbind(svm_prop,tree_prop ,maxent_prop)
+kable(performance)
+```
+
+Evaluate the true-positive(spam was predicted as spam), false-positive(ham was predicted as spam), true-negative(ham was predicted as ham), false-negative(spam was predicted as ham).
+```{r}
+svm <- table(correct = labels_out[,1], estimated = labels_out[,2])
+svm.df <- as.data.frame(svm)
+svm.df$class <- c("t-n","f-n","f-p","t-p")
+kable(svm.df)
+```
+
+```{r}
+tree <- table(correct = labels_out[,1], estimated = labels_out[,3])
+tree.df <- as.data.frame(tree)
+tree.df$class <- c("t-n","f-n","f-p","t-p")
+
+maxent <- table(correct = labels_out[,1], estimated = labels_out[,4])
+maxent.df <- as.data.frame(maxent)
+maxent.df$class <- c("t-n","f-n","f-p","t-p")
+
+library(dplyr)
+svm.df <- cbind(svm.df,svm.df$Freq)
+svm.df[,3] <- NULL
+
+accurary <- cbind(svm.df, tree.df$Freq, maxent.df$Freq)
+colnames(accurary) <- c("correct","estimated","class","svm.Freq","tree.Freq","maxent.Freq")
+accurary$svm.rate <- accurary$`svm.Freq`/sum(accurary$`svm.Freq`)
+accurary$tree.rate <- accurary$`tree.Freq`/sum(accurary$`tree.Freq`)
+accurary$maxent.rate <- accurary$`maxent.Freq`/sum(accurary$`maxent.Freq`)
+kable(accurary)
+```
+
+
+```{r}
+par(mfrow=c(1,3))
+mosaicplot (svm)
+mosaicplot (tree)
+mosaicplot (maxent)
+```
+Overall error rate is very low, 0 - 0.7%. Relatively, Forest Tree method has the lowest false negative and highest false positive. 
+
+```{r}
+accurary_long <- gather(accurary, method, rate, 7:9)
+
+ggplot(data = accurary_long, mapping = aes(x = method, y = rate)) + 
+  geom_point(mapping = aes(color = class, size = class)) +
+  ggtitle('Accuracy')
+```
+
+Majority of the email, 85%, is trully non-spam email and true spam eamils account for around 14.5% of all emails.
+
+## Coclusion
+
+In this document classification project I used 50% of emails as my training data and the rest as test data, I used three algorisms - Support vector machines, Forest tree, and Maximum entropy to do the classification. In the test, the accurary of these three models are: gave us over 99.3%, 99.3% and 98.9%. All three methods performed equally well.  
+
+
+## Unsupervised text classification
+
+** LDA: the Latent Dirichlet Allocation**
+```{r}
+library(topicmodels)
+lda_out <- LDA(dtm_mix, 2)
+posterior_lda <- posterior(lda_out)
+lda_topics <- data.frame(t(posterior_lda$topics))
+
+mean_topic_matrix <- matrix(
+NA,
+nrow = 2,
+ncol = 2,
+dimnames = list(names(table(classify_labels)),c("Ham", "Spam"))
+)
+
+## Filling matrix
+for(i in 1:2){
+mean_topic_matrix[i,] <- apply(lda_topics[, which(classify_labels ==
+rownames(mean_topic_matrix)[i])], 1, mean)
+}
+
+## Outputting rounded matrix
+round(mean_topic_matrix, 2)
+terms(lda_out, 20)
+```
+
+The terms, at least the first 20, assicated to either ham or spam could not help people to figure out the label. Maybe for unsupervised method it will be more appropriate to only extrac the email body for text analysis.
+
+
+
