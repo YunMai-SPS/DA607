@@ -20,6 +20,7 @@ install.packages("RTextTools")
 install.packages("SnowballC")
 install.packages("vcd")
 install.packages("topicmodels")
+install.packages("wordcloud")
 ```
 
 ```{r}
@@ -81,7 +82,6 @@ meta(ham.corpus[[1]], type = "corpus")
 ** easy_ham **
 
 ```{r}
- 
 n <- 1
 for (i in 2:length(easy_ham)){
   tmp <- readLines(easy_ham[i])
@@ -307,14 +307,15 @@ mosaicplot (svm)
 mosaicplot (tree)
 mosaicplot (maxent)
 ```
+
 Overall error rate is very low, 0 - 0.7%. Relatively, Forest Tree method has the lowest false negative and highest false positive. 
 
 ```{r}
 accurary_long <- gather(accurary, method, rate, 7:9)
 
-ggplot(data = accurary_long, mapping = aes(x = method, y = rate)) + 
-  geom_point(mapping = aes(color = class, size = class)) +
-  ggtitle('Accuracy')
+ggplot(accurary_long, aes(x = factor(class), fill = factor(method), y = rate)) +
+  geom_dotplot(binaxis = "y", stackdir = "center", position = "dodge")
+ #> `stat_bindot()` using `bins = 30`. Pick better value with `binwidth`.
 ```
 
 Majority of the email, 85%, is trully non-spam email and true spam eamils account for around 14.5% of all emails.

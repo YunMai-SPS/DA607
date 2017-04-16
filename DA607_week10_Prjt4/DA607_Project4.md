@@ -14,6 +14,7 @@ For this project, you can start with a spam/ham dataset, then predict the class 
     install.packages("SnowballC")
     install.packages("vcd")
     install.packages("topicmodels")
+    install.packages("wordcloud")
 
 ``` r
 options(repos="https://cran.rstudio.com" )
@@ -152,7 +153,7 @@ meta(ham.corpus[[1]], type = "corpus")
 ```
 
     ##   author       : character(0)
-    ##   datetimestamp: 2017-04-16 03:50:00
+    ##   datetimestamp: 2017-04-16 07:03:34
     ##   description  : character(0)
     ##   heading      : character(0)
     ##   id           : 1
@@ -290,7 +291,7 @@ meta(mix.corpus[[1]], type = "corpus")
 ```
 
     ##   author       : character(0)
-    ##   datetimestamp: 2017-04-16 03:50:04
+    ##   datetimestamp: 2017-04-16 07:03:38
     ##   description  : character(0)
     ##   heading      : character(0)
     ##   id           : 1
@@ -506,19 +507,24 @@ mosaicplot (tree)
 mosaicplot (maxent)
 ```
 
-![](DA607_Project4_files/figure-markdown_github/unnamed-chunk-23-1.png) Overall error rate is very low, 0 - 0.7%. Relatively, Forest Tree method has the lowest false negative and highest false positive.
+![](DA607_Project4_files/figure-markdown_github/unnamed-chunk-23-1.png)
+
+Overall error rate is very low, 0 - 0.7%. Relatively, Forest Tree method has the lowest false negative and highest false positive.
 
 ``` r
 accurary_long <- gather(accurary, method, rate, 7:9)
 
-ggplot(data = accurary_long, mapping = aes(x = method, y = rate)) + 
-  geom_point(mapping = aes(color = class, size = class)) +
-  ggtitle('Accuracy')
+ggplot(accurary_long, aes(x = factor(class), fill = factor(method), y = rate)) +
+  geom_dotplot(binaxis = "y", stackdir = "center", position = "dodge")
 ```
 
-    ## Warning: Using size for a discrete variable is not advised.
+    ## `stat_bindot()` using `bins = 30`. Pick better value with `binwidth`.
 
 ![](DA607_Project4_files/figure-markdown_github/unnamed-chunk-24-1.png)
+
+``` r
+ #> `stat_bindot()` using `bins = 30`. Pick better value with `binwidth`.
+```
 
 Majority of the email, 85%, is trully non-spam email and true spam eamils account for around 14.5% of all emails.
 
@@ -561,8 +567,8 @@ round(mean_topic_matrix, 2)
 ```
 
     ##       Ham Spam
-    ## Ham  0.92 0.08
-    ## Spam 0.77 0.23
+    ## Ham  0.94 0.06
+    ## Spam 0.76 0.24
 
 ``` r
 terms(lda_out, 20)
@@ -579,15 +585,15 @@ terms(lda_out, 20)
     ##  [8,] "istreceiv"         "cellspac"              
     ##  [9,] "thu"               "size"                  
     ## [10,] "mon"               "font"                  
-    ## [11,] "wed"               "faceari"               
-    ## [12,] "from"              "heightd"               
+    ## [11,] "from"              "faceari"               
+    ## [12,] "wed"               "heightd"               
     ## [13,] "jalapeno"          "img"                   
     ## [14,] "jmlocalhost"       "srchttpwwwcnetcombgif" 
     ## [15,] "tue"               "borderd"               
     ## [16,] "dogmaslashnullorg" "heighttdtd"            
     ## [17,] "the"               "srchttphomecnetcombgif"
     ## [18,] "returnpath"        "alt"                   
-    ## [19,] "use"               "arial"                 
-    ## [20,] "fri"               "srchttpwwwzdnetcombgif"
+    ## [19,] "fri"               "arial"                 
+    ## [20,] "use"               "srchttpwwwzdnetcombgif"
 
 The terms, at least the first 20, assicated to either ham or spam could not help people to figure out the label. Maybe for unsupervised method it will be more appropriate to only extrac the email body for text analysis.
