@@ -1,0 +1,8 @@
+name: Publish Document
+title:
+account: rpubs
+server: rpubs.com
+appId: https://api.rpubs.com/api/v1/document/270300/286e1d9612f14c3fb30bab981296d53d
+bundleId: https://api.rpubs.com/api/v1/document/270300/286e1d9612f14c3fb30bab981296d53d
+url: http://rpubs.com/YunMai/270300
+when: 1493001251.3076
