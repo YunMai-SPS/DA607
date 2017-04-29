@@ -1,0 +1,31 @@
+"","row_names","MovieID","MovieName","FriendID","FriendName","FriendRating"
+"1","1",1,"The Fate of the Furious",1,"Ming",2
+"2","2",2,"Star Wars: The Last Jedi",1,"Ming",4
+"3","3",3,"Guardians of the Galaxy Vol. ",1,"Ming",4
+"4","4",4,"Thor: Ragnarok",1,"Ming",1.5
+"5","5",5,"Beauty and the Beast",1,"Ming",4
+"6","6",6,"Logan",1,"Ming",5
+"7","7",1,"The Fate of the Furious",2,"Hao",1
+"8","8",2,"Star Wars: The Last Jedi",2,"Hao",4.5
+"9","9",3,"Guardians of the Galaxy Vol. ",2,"Hao",3
+"10","10",4,"Thor: Ragnarok",2,"Hao",4
+"11","11",5,"Beauty and the Beast",2,"Hao",4
+"12","12",6,"Logan",2,"Hao",1.5
+"13","13",1,"The Fate of the Furious",3,"Alison",4.5
+"14","14",2,"Star Wars: The Last Jedi",3,"Alison",1.5
+"15","15",3,"Guardians of the Galaxy Vol. ",3,"Alison",2
+"16","16",4,"Thor: Ragnarok",3,"Alison",4
+"17","17",5,"Beauty and the Beast",3,"Alison",5
+"18","18",6,"Logan",3,"Alison",1
+"19","19",1,"The Fate of the Furious",4,"Eran",3
+"20","20",2,"Star Wars: The Last Jedi",4,"Eran",1
+"21","21",3,"Guardians of the Galaxy Vol. ",4,"Eran",3.5
+"22","22",4,"Thor: Ragnarok",4,"Eran",2
+"23","23",5,"Beauty and the Beast",4,"Eran",5
+"24","24",6,"Logan",4,"Eran",1.5
+"25","25",1,"The Fate of the Furious",5,"Orshi",2.5
+"26","26",2,"Star Wars: The Last Jedi",5,"Orshi",2
+"27","27",3,"Guardians of the Galaxy Vol. ",5,"Orshi",1.5
+"28","28",4,"Thor: Ragnarok",5,"Orshi",2
+"29","29",5,"Beauty and the Beast",5,"Orshi",4
+"30","30",6,"Logan",5,"Orshi",1.5
