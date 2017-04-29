@@ -1,0 +1,152 @@
+---
+title: "Migrating database from MySQL to Neo4j"
+author: "Yun Mai"
+date: "April 30, 2017"
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+```
+
+## NoSQL migration
+
+Assignment:
+
+For this assignment, you should take information from a relational database and migrate it to a NoSQL database of your own choosing. 
+
+For the relational database, you might use the flights database, the tb database, the "data skills" database your team created for Project 3, or another database of your own choosing or creation.
+
+For the NoSQL database, you may use MongoDB (which we introduced in week 7), Neo4j, or another NoSQL database of your choosing.
+
+Your migration process needs to be reproducible.  R code is encouraged, but not required.  You should also briefly describe the advantages and disadvantages of storing the data in a relational database vs. your NoSQL database.
+
+Overview:
+
+I will migrated the movie_rating database generated in week_2 homework to Neo4j. Nodes will be created first followed by buiding relationships. At last the graph will be viewed with visualization tool.
+
+```{r,eval=F}
+devtools::install_github("nicolewhite/Rneo4j") 
+```
+
+```{r}
+library(RMySQL)
+library(RNeo4j)
+```
+
+## Get the Data from MySQL
+```{r, echo= F}
+mysql_pw <- "5201"
+```
+
+```{r}
+# connect to MySQL local database
+movie_con <- dbConnect(MySQL(), user="root", password=mysql_pw, dbname = "movie_rating", host = "localhost")
+```
+
+
+```{r}
+#Send query to MySQL and retrieve the movie data from MySQL.
+query.movie <- dbSendQuery(movie_con, "SELECT * FROM movie")
+movie.data <- dbFetch(query.movie, n=-1)
+
+#Send query to MySQL and retrieve the friends data from MySQL. Friends are the people who rated the movies
+query.friends <- dbSendQuery(movie_con, "SELECT * FROM friends")
+friends.data <- dbFetch(query.friends, n=-1)
+
+#Send query to MySQL and retrieve the rating data from MySQL.
+query.rating <- dbSendQuery(movie_con, "SELECT * FROM rating")
+rating.data <- dbFetch(query.rating, n=-1)
+```
+
+**Export data as .csv files**
+```{r}
+write.csv(movie.data, "movie.csv")
+write.csv(friends.data, "friends.csv")
+write.csv(rating.data, "rating.csv")
+```
+
+**Disconnect from MySQL**
+```{r}
+dbDisconnect(movie_con)
+```
+
+
+## Load the data to Neo4j
+
+**Download .csv files**
+
+```{r}
+friends_d <- read.csv(file="https://raw.githubusercontent.com/YunMai-SPS/DA607/master/DA607_homework13/friends.csv", header=TRUE, sep=",", stringsAsFactors = F)
+
+movie_d <- read.csv(file="https://raw.githubusercontent.com/YunMai-SPS/DA607/master/DA607_homework13/movie.csv", header=TRUE, sep=",", stringsAsFactors = F)
+
+rating_d <- read.csv(file="https://raw.githubusercontent.com/YunMai-SPS/DA607/master/DA607_homework13/rating.csv", header=TRUE, sep=",", stringsAsFactors = F)
+```
+
+
+```{r,echo=F}
+neo4j.pw <- "data607"
+```
+
+```{r}
+#connect to Neo4j
+graph = startGraph("http://localhost:7474/db/data", username = "neo4j", password = neo4j.pw)
+#clear(graph) could be used to delete all nodes, relationships, indexes, and constraints from the graph database
+
+# two kinds of nodes will be created: movie and person. the same nodes will be merged.
+query = "MERGE (:movie {name:{title}, id:{movieid}}),MERGE (:person {name:{name},movieid:{movieid},rating:{friendrating}})"
+
+for (i in 1:nrow(rating_d)){
+  query
+  title = rating_d$MovieName[i]
+  id = rating_d$MovieID[i]
+  name = rating_d$FriendName[i]
+  movieid = rating_d$MovieID[i]
+  rating = rating_d$FriendRating[i]
+}
+```
+
+
+```{r}
+query = "MATCH (a:movie), (b:person) WHERE (a.id) = (b.movieid)  CREATE (a)-[:RATED{rating}]->(b)"
+
+tx = newTransaction(graph)
+appendCypher(tx, query)
+commit(tx)
+```
+
+
+```{r}
+query = "
+MATCH (Ming:person)-[r:RATED]->(m:movie)
+WHERE Ming.name = 'Ming'
+RETURN Ming.name, r.rating, m.title
+"
+cypher(graph, query)
+```
+
+```{r}
+query = "
+MATCH (Ming:person)-[r:RATED]->(m:movie)
+WHERE Ming.name = 'Ming'
+RETURN Ming.name, COLLECT(m.movie) AS seen
+"
+
+cypherToList(graph, query)
+```
+
+```{r}
+query = "
+MATCH (p1:Person)-[r:RATED]->(m1:movie)
+WHERE p1.name = {name1} AND m1:movie = {title1}
+RETURN p1.name, r.weight, m1:movie
+"
+
+cypher(graph, query, name1="Hao", name2="The Fate of the Furious")
+```
+
+## View Neo4j Graph
+```{r}
+browse(graph)
+```
