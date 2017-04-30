@@ -1,25 +1,28 @@
-"","row_names","writers","writerID"
-"1","1","Chris Morgan",1
-"2","2","Gary Scott Thompson",2
-"3","3","Rian Johnson",3
-"4","4","George Lucas",4
-"5","5","James Gunn",5
-"6","6","Dan Abnett",6
-"7","7","Andy Lanning",7
-"8","8","Stan Lee",8
-"9","9","Jack Kirby",9
-"10","10","Gene Colan",10
-"11","11","Arnold Drake",11
-"12","12","Steve Englehart",12
-"13","13","Steve Gan",13
-"14","14","Jim Starlin",14
-"15","15","Craig Kyle",15
-"16","16","Christopher Yost",16
-"17","17","Stephany Folsom",17
-"18","18","Eric Pearson",18
-"19","19","Larry Lieber",19
-"20","20","Stephen Chbosky",20
-"21","21","Evan Spiliotopoulos",21
-"22","22","James Mangold",22
-"23","23","Scott Frank",23
-"24","24","Michael Green",24
+"","row_names","writers","title","writerID"
+"1","1","Chris Morgan","The Fate of the Furious",1
+"2","2","Gary Scott Thompson","The Fate of the Furious",2
+"3","3","Rian Johnson","Star Wars: The Last Jedi",3
+"4","4","George Lucas","Star Wars: The Last Jedi",4
+"5","5","James Gunn","Guardians of the Galaxy Vol. ",5
+"6","6","Dan Abnett","Guardians of the Galaxy Vol. ",6
+"7","7","Andy Lanning","Guardians of the Galaxy Vol. ",7
+"8","8","Stan Lee","Guardians of the Galaxy Vol. ",8
+"9","9","Jack Kirby","Guardians of the Galaxy Vol. ",9
+"10","10","Gene Colan","Guardians of the Galaxy Vol. ",10
+"11","11","Arnold Drake","Guardians of the Galaxy Vol. ",11
+"12","12","Steve Englehart","Guardians of the Galaxy Vol. ",12
+"13","13","Steve Gan","Guardians of the Galaxy Vol. ",13
+"14","14","Jim Starlin","Guardians of the Galaxy Vol. ",14
+"15","15","Craig Kyle","Thor: Ragnarok",15
+"16","16","Christopher Yost","Thor: Ragnarok",16
+"17","17","Stephany Folsom","Thor: Ragnarok",17
+"18","18","Eric Pearson","Thor: Ragnarok",18
+"19","19","Stan Lee","Thor: Ragnarok",19
+"20","20","Larry Lieber","Thor: Ragnarok",20
+"21","21","Jack Kirby","Thor: Ragnarok",21
+"22","22","Stephen Chbosky","Beauty and the Beast",22
+"23","23","Evan Spiliotopoulos","Beauty and the Beast",23
+"24","24","James Mangold","Logan",24
+"25","25","Scott Frank","Logan",25
+"26","26","James Mangold","Logan",26
+"27","27","Michael Green","Logan",27

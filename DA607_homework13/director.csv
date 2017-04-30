@@ -1,7 +1,7 @@
-"","row_names","directors","directorID"
-"1","1","James Mangold",1
-"2","2","Bill Condon",2
-"3","3","Taika Waititi",3
-"4","4","James Gunn",4
-"5","5","Rian Johnson",5
-"6","6","F. Gary Gray",6
+"","row_names","directors","title","directorID"
+"1","1","F. Gary Gray","The Fate of the Furious",1
+"2","2","Rian Johnson","Star Wars: The Last Jedi",2
+"3","3","James Gunn","Guardians of the Galaxy Vol. ",3
+"4","4","Taika Waititi","Thor: Ragnarok",4
+"5","5","Bill Condon","Beauty and the Beast",5
+"6","6","James Mangold","Logan",6
