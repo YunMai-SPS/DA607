@@ -552,14 +552,6 @@ tabular results could be returned by using Cypher. As introduced in Nicole White
 
 ``` r
 query = "
-MATCH (audience:Audience)-[RATED]-(movie:Movie {title: 'Beauty and the Beast'}) 
-RETURN audience.name, Type(RATED), RATED"
-
-cypher(graph, query)
-```
-
-``` r
-query = "
 MATCH (audience:Audience)-[r:RATED]->(movie:Movie)
 WHERE audience.name = 'Ming'
 RETURN audience.name, r.rating, movie.name
@@ -594,17 +586,35 @@ cypherToList(graph, query)
     ## [[1]]$seen
     ## list()
 
+``` r
+query = "
+MATCH (audience:Audience)-[r:RATED]-(movie:Movie {name:'Beauty and the Beast'}) 
+RETURN audience.name, movie.name,r.rating"
+
+cypher(graph, query)
+```
+
+    ##   audience.name           movie.name r.rating
+    ## 1         Orshi Beauty and the Beast        4
+    ## 2          Eran Beauty and the Beast        5
+    ## 3        Alison Beauty and the Beast        5
+    ## 4           Hao Beauty and the Beast        4
+    ## 5          Ming Beauty and the Beast        4
+
 Parameters can be passed
 
 ``` r
 query = "
 MATCH (audience:Audience)-[r:RATED]-> (movie:Movie)
-WHERE audience.name = {name1} AND movie:movie = {title1}
-RETURN audience.name, r.rating, movie:movie
+WHERE audience.name = {name1} AND movie.name = {name2}
+RETURN audience.name, r.rating, movie.name
 "
 
-cypher(graph, query, name1="Hao", title1="The Fate of the Furious")
+cypher(graph, query, name1="Hao", name2="The Fate of the Furious")
 ```
+
+    ##   audience.name r.rating              movie.name
+    ## 1           Hao        1 The Fate of the Furious
 
 Browse Neo4j Graph
 ------------------

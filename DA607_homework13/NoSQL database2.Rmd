@@ -412,13 +412,7 @@ summary(graph)
 
 
 tabular results could be returned by using Cypher. As introduced in Nicole White's GitHub RNeo4j repo "https://github.com/nicolewhite/RNeo4j#nodes"
-```{r}
-query = "
-MATCH (audience:Audience)-[RATED]-(movie:Movie {title: 'Beauty and the Beast'}) 
-RETURN audience.name, Type(RATED), RATED"
 
-cypher(graph, query)
-```
 
 ```{r}
 query = "
@@ -441,16 +435,23 @@ cypherToList(graph, query)
 
 ```
 
+```{r}
+query = "
+MATCH (audience:Audience)-[r:RATED]-(movie:Movie {name:'Beauty and the Beast'}) 
+RETURN audience.name, movie.name,r.rating"
+
+cypher(graph, query)
+```
 
 Parameters can be passed
 ```{r}
 query = "
 MATCH (audience:Audience)-[r:RATED]-> (movie:Movie)
-WHERE audience.name = {name1} AND movie:movie = {title1}
-RETURN audience.name, r.rating, movie:movie
+WHERE audience.name = {name1} AND movie.name = {name2}
+RETURN audience.name, r.rating, movie.name
 "
 
-cypher(graph, query, name1="Hao", title1="The Fate of the Furious")
+cypher(graph, query, name1="Hao", name2="The Fate of the Furious")
 ```
 
 
