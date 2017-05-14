@@ -76,11 +76,11 @@ lapNo	pit	time	No	name
 12 P	1	1:17.049	6	N. ROSBERG								
 13 P	1	2:03.250	6	N. ROSBERG								
 14 P	1	2:09.865	6	N. ROSBERG								
-15	0	15:36.3	 6	N. ROSBERG								
+15	0	15:36.3  6	N. ROSBERG								
 16	0	1:07.644	6	N. ROSBERG								
 17	0	1:46.575	6	N. ROSBERG								
-18	0	01:26.7	  6	N. ROSBERG								
-19	0	01:07.4	  6	N. ROSBERG								
+18	0	01:26.7  6	N. ROSBERG								
+19	0	01:07.4   6	N. ROSBERG								
 20	0	1:50.911	6	N. ROSBERG								
 21	0	1:42.171	6	N. ROSBERG								
 22 P	1	1:30.618	6	N. ROSBERG								
