@@ -6,19 +6,29 @@ April 22, 2017
 Motivation
 ----------
 
-I choose Formula One as the topic of the final project because I want to understand how to entertain a data driven sport and to learn how this industry work. To me, the most fascinated part of this sport is its technical aspect as it represents both the advanced automobile and aeronautical engineering. While Formula One could be seen as automobile companies showcasing their ability to perform in racing sport, it brings the fast evolution of the technologies behind the sport. The racing telemetry collect data like the speed, stability, tire wear, and aerodynamics etc. combined with data analytics allows engineers to evaluate the performance of cars around the racing track and figure out what needs to change. The audience could anticipate the enhanced engineering by each passing season. Therefore data is the trade secret for each team because whether teams can shave hundredths of seconds off their lap times will rely on the details of those data. Another reason I like to investigate Formula One is that it is a game of number. For example, 1.5 GB of data will generate for each car per race for McLaren. Each weekend the Grand Prix racing results broadcast on TV so that audience can follow the race and be updated. More data including practice laps, warming up are available at Formula One Live Timing. So there are plenty of data for me to do interesting analysis in this sport.
+Formula One, abbreviated to F1, is the highest class of open-wheeled auto racing defined by the Fédération Internationale de l'Automobile (FIA), motorsport's world governing body. The "formula" in the name refers to a set of rules to which all participants and vehicles must conform. The F1 World Championship season consists of a series of races, known as Grands Prix, usually held on purpose-built circuits, and in a few cases on closed city streets. The results of each race are combined to determine two annual championships, one for drivers and one for constructors.(<https://en.wikipedia.org/wiki/Formula_One>)
+
+I choose Formula One as the topic of the final project because I want to understand how to entertain a data driven sport and to learn how this industry work. To me, the most fascinated part of this sport is its technical aspect as it represents both the advanced automobile and aeronautical engineering. While Formula One could be seen as automobile companies showcasing their ability to perform in racing sport, it brings the fast evolution of the technologies behind the sport. The racing telemetry collect data like the speed, stability, tire wear, and aerodynamics etc. combined with data analytics allows engineers to evaluate the performance of cars around the racing track and figure out what needs to change. The audience could anticipate the enhanced engineering by each passing season. Therefore data is the trade secret for each team because whether teams can shave hundredths of seconds off their lap times will rely on the details of those data. Another reason I like to investigate Formula One is that it is a game of number. For example, 1.5 GB of data will generate for each car per race for McLaren. Each weekend the Grand Prix racing results broadcast on TV so that audience can follow the race and be updated. More data including practice laps, warming up are available at Formula One Live Timing. So there are plenty of data for me to do interesting analysis in this sport. The third reason I think Formula One would be fun is that the participants could work out the best strategy to win the game as all participants' cars must conform the "formula", a set of rules, as designated in the name. As such, Formula One is a sport mixed with technology, brain, speed, and number, which perfect for people who like sport and strategy game at the same time.
 
 Goal
 ----
 
-The goal of this project is to apply R language and MySQL I've learned in Data Acquisition and Management Course to collect, structure and visualize data in the context of Formula One sporting. At the same time, I hope I can learn the history of this sport and learn how this industry works through digging the data of racing results. Formula One rule becomes more and more complicated in the regulation of the costs, safety. Thought this gives the dedicated fans more fun, it makes it difficult to someone who is new to this sport to enjoy it right away. To knowing how technical and sporting regulations shape this sport, I will extract the information from the archive and find out quantification analysis.
+The goal of this project is to apply R language and MySQL I've learned in Data Acquisition and Management Course to collect, structure and visualize data in the context of Formula One sporting. At the same time, I will learn the history of this sport and learn how this industry works through digging the data of racing results. Formula One rule becomes more and more complicated in the regulation of the costs, safety. Thought this gives the dedicated fans more fun, it makes it difficult to someone who is new to this sport to enjoy it right away. To knowing how technical and sporting regulations shape this sport, I will extract the information from the archive and find out quantification analysis.
 
 Data Science Workflow
 ---------------------
 
 To obtain the goal, I will use OSEMN model. That is, I will execute a data science workflow that includes:
 
-Obtaining data Scrubbing data Exploring data Modeling data iNterpreting data
+1.**O**btaining data
+
+2.**S**crubbing data
+
+3.**E**xploring data
+
+4.**M**odeling data
+
+5.i**N**terpreting data
 
 **1.Obtaining data**
 
@@ -30,15 +40,20 @@ Data were collected from the following data source:
 
 3.Formula1.com archive from 1950-2016 (<https://www.formula1.com/en/results.html/1950/races/94/great-britain/race-result.html>) (Great Britain) and the and the current year data in this URL: <https://www.formula1.com/en/results.html/2017/races/959/australia/fastest-laps.html>
 
-For API, JSON file were downloaded and stored. For PDF, PDFTables(<https://pdftables.com/>) was used to extract data and convert to .xlsx files followed by a convertion to .txt file. R packages "RCurl", "jsonlite", "XML" will be used in downloading data from the websites.
+For API, JSON files were downloaded and stored. For PDF, PDFTables(<https://pdftables.com/>) was used to extract data and convert to .xlsx files followed by a conversion to .txt file. R packages "RCurl", "jsonlite", "XML" will be used in downloading data from the websites.
 
-Packages as shown in the following used in this projects were loaded.
+Packages used in this projects: RCurl, XML. tidyr,dplyr,stringr,knitr,ggplot2, jsonlite.
 
-    ## Warning: package 'RCurl' was built under R version 3.3.3
+``` r
+library(RCurl)
+```
 
     ## Loading required package: bitops
 
-    ## Warning: package 'XML' was built under R version 3.3.3
+``` r
+library(XML)
+library(tidyr)
+```
 
     ## 
     ## Attaching package: 'tidyr'
@@ -47,7 +62,9 @@ Packages as shown in the following used in this projects were loaded.
     ## 
     ##     complete
 
-    ## Warning: package 'dplyr' was built under R version 3.3.3
+``` r
+library(dplyr)
+```
 
     ## 
     ## Attaching package: 'dplyr'
@@ -60,17 +77,20 @@ Packages as shown in the following used in this projects were loaded.
     ## 
     ##     intersect, setdiff, setequal, union
 
-    ## Warning: package 'stringr' was built under R version 3.3.3
-
-    ## Warning: package 'ggplot2' was built under R version 3.3.3
+``` r
+library(stringr)
+library(knitr)
+library(ggplot2)
+library(jsonlite)
+```
 
 **2.Scrubbing data**
 
-The raw data were downloaded from the above mentioned resources. Data tidying and reorganizing were performed to transform the data to a structure that is easy for analysis and modling. For example, some unnecessary variables were removed and some number will be converted to numeric or character type as they would be used as continuous or categorical variables. R packages "stringr", "tidyr", "dplyr", "knitr" were used. "RMySQL" were used in data cleaning, transforming and storage.
+The raw data were downloaded from the above-mentioned resources. Data tidying and reorganizing were performed to transform the data to a structure that is easy for analysis and modeling. For example, some unnecessary variables were removed and some number will be converted to numeric or character type as they would be used as continuous or categorical variables. R packages "stringr", "tidyr", "dplyr", "knitr" were used. "RMySQL" were used in data cleaning, transforming and storage.
 
 **3.Exploring data**
 
-After cleaning the data in hands, basic statistics were done such as viewing the distribution of the data. Mean and standard diviation of some of the data were checked. Some sporting related analysis was also performed. For example, whether there was racer not qualified in the qualifying session was checked.
+After cleaning the data in hands, basic statistics were done such as viewing the distribution of the data. Mean and standard deviation of some of the data were checked. Some sporting related analysis was also performed. For example, whether there was racer not qualified in the qualifying session was checked.
 
 **4.Modeling data and iNterpreting data**
 
@@ -78,107 +98,27 @@ Overview:
 
 The path to the championship: plot the position changes of each team and driver to see their Chronological performance.
 
-Practice time utilization: to reproduce how each driver uses the track in the practice, the accumulated time derived from the lap time record was calculated and plotted. The stint time (between pit stops) segmentation with the time elapse could be viewd from the plot.
+Practice time utilization: to reproduce how each driver uses the track in the practice, the accumulated time derived from the lap time record was calculated and plotted. The stint time (between pit stops) segmentation with the time elapse could be viewed from the plot.
 
 Lap chart: position changes of each driver at each run of qualifying.
 
-Race chart: the gap to the leader of each driver at each lap was ploted to view the relative position change with the time elapse.
+Race chart: the gap to the leader of each driver at each lap was plotted to view the relative position change with the time elapse.
 
 Reproduce the fight for the lead: calculate and plot the difference of lap times between to two fighting cars at each lap will give people close look at the battle
 
-Championship: (List of Formula One World Championship points scoring system. from Wikipedia) The total points of 1st and 2nd drivers were calculated and the best performers were defined by theirs points and times won the championship.
+Championship: (List of Formula One World Championship points scoring system. from Wikipedia) The total points of 1st and 2nd drivers were calculated and the best performers were defined by their points and times won the championship.
+
+Data collecting and Analyzing
+-----------------------------
+
+**Path to the championship - Team**
+
+As a person who is new to Formula One, I want to start from knowing the teams and the racers. Formula one official website did not disappoint a new fan like me as it archived the racing results, driver standing, team standing, and fastest lap awards from 1950 to the current season.
+
+First, I will look at how each team fought for their championship through the years. It is also anticipated to see the come and go of some teams in the F1 history. As the Constructors Championship was not awarded until 1958, data from 1950 till now will be collected.
 
 ``` r
-json_url <- "http://ergast.com/api/f1/2016/9/qualifying.json"
-jsonFile <- getURL(json_url)
-jsonContent <- fromJSON(jsonFile)
-json_table5 <- jsonContent$MRData
-
-json_table6 <-json_table5$RaceTable
-json_table7 <-json_table6$Races
-json_table8 <-json_table7$QualifyingResults
-json_table9 <-json_table8[[1]]
-json_table10 <-json_table9[["Driver"]]
-json_table11 <-json_table9[["Constructor"]]
-json_table9$Driver <- NULL
-json_table9$Constructor <- NULL
-json_table<- cbind(json_table9,json_table10)
-json_table <- cbind(json_table,json_table11)
-json_table <- json_table[,c("number","position", "Q1", "Q2", "Q3", "driverId","permanentNumber", "code", "url", "givenName", "familyName", "dateOfBirth", "nationality", "constructorId", "url", "name", "nationality")]
-json_table$permanentNumber <- NULL
-kable(head(json_table,n=5))
-```
-
-| number | position | Q1       | Q2       | Q3       | driverId   | code | url                                                 | givenName | familyName | dateOfBirth | nationality | constructorId | url.1                                               | name        | nationality.1 |
-|:-------|:---------|:---------|:---------|:---------|:-----------|:-----|:----------------------------------------------------|:----------|:-----------|:------------|:------------|:--------------|:----------------------------------------------------|:------------|:--------------|
-| 44     | 1        | 1:06.947 | 1:06.228 | 1:07.922 | hamilton   | HAM  | <http://en.wikipedia.org/wiki/Lewis_Hamilton>       | Lewis     | Hamilton   | 1985-01-07  | British     | mercedes      | <http://en.wikipedia.org/wiki/Lewis_Hamilton>       | Mercedes    | British       |
-| 6      | 2        | 1:06.516 | 1:06.403 | 1:08.465 | rosberg    | ROS  | <http://en.wikipedia.org/wiki/Nico_Rosberg>         | Nico      | Rosberg    | 1985-06-27  | German      | mercedes      | <http://en.wikipedia.org/wiki/Nico_Rosberg>         | Mercedes    | German        |
-| 27     | 3        | 1:07.385 | 1:07.257 | 1:09.285 | hulkenberg | HUL  | <http://en.wikipedia.org/wiki/Nico_H%C3%BClkenberg> | Nico      | Hülkenberg | 1987-08-19  | German      | force\_india  | <http://en.wikipedia.org/wiki/Nico_H%C3%BClkenberg> | Force India | German        |
-| 5      | 4        | 1:06.761 | 1:06.602 | 1:09.781 | vettel     | VET  | <http://en.wikipedia.org/wiki/Sebastian_Vettel>     | Sebastian | Vettel     | 1987-07-03  | German      | ferrari       | <http://en.wikipedia.org/wiki/Sebastian_Vettel>     | Ferrari     | German        |
-| 22     | 5        | 1:07.653 | 1:07.572 | 1:09.900 | button     | BUT  | <http://en.wikipedia.org/wiki/Jenson_Button>        | Jenson    | Button     | 1980-01-19  | British     | mclaren       | <http://en.wikipedia.org/wiki/Jenson_Button>        | McLaren     | British       |
-
-``` r
-#convert qualifying time Q1 time to seconds and annotated as "ctime"
-json_table$Q1m <- as.numeric(str_extract(json_table$Q1,"\\d+"))
-
-json_table$Q1s <- str_extract(json_table$Q1,":\\d+.")
-json_table$Q1s <- as.numeric(str_extract(json_table$Q1s,"\\d+"))
-
-json_table$Q1ms <- str_extract(json_table$Q1, "\\.\\d+")
-json_table$Q1ms <- as.numeric(str_extract(json_table$Q1ms,"\\d+")) 
-  
-json_table$Q1ctime <- json_table$Q1m * 60 + json_table$Q1s +(json_table$Q1ms)/1000
-
-#convert qualifying time Q2 time to seconds and annotated as "ctime"
-json_table$Q2m <- as.numeric(str_extract(json_table$Q2,"\\d+"))
-
-json_table$Q2s <- str_extract(json_table$Q2,":\\d+.")
-json_table$Q2s <- as.numeric(str_extract(json_table$Q2s,"\\d+"))
-
-json_table$Q2ms <- str_extract(json_table$Q2, "\\.\\d+")
-json_table$Q2ms <- as.numeric(str_extract(json_table$Q2ms,"\\d+")) 
-  
-json_table$Q2ctime <- json_table$Q2m * 60 + json_table$Q2s +(json_table$Q2ms)/1000
-
-#convert qualifying time Q3 time to seconds and annotated as "ctime"
-json_table$Q3m <- as.numeric(str_extract(json_table$Q3,"\\d+"))
-
-json_table$Q3s <- str_extract(json_table$Q3,":\\d+.")
-json_table$Q3s <- as.numeric(str_extract(json_table$Q3s,"\\d+"))
-
-json_table$Q3ms <- str_extract(json_table$Q3, "\\.\\d+")
-json_table$Q3ms <- as.numeric(str_extract(json_table$Q3ms,"\\d+")) 
-  
-json_table$Q3ctime <- json_table$Q3m * 60 + json_table$Q3s +(json_table$Q3ms)/1000
-```
-
-``` r
-ggplot(json_table,aes(Q1ctime))+
-  geom_histogram(binwidth = 0.02)+
-  labs(x=" Q1 qualifying time - Grand Prix of Austria July 3, 2016")
-```
-
-![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-4-1.png)
-
-Normal distribution of the fast laptime is not anticipated in the F1 qualifying session.
-
-**107% rule:** The 107% rule is a sporting regulation affecting Formula One racing qualifying sessions. During the first phase of qualifying, any driver who fails to set a lap within 107 percent of the fastest time in the first qualifying session will not be allowed to start the race.
-
-``` r
-q <-min(json_table$Q1ctime)*1.07
-qualifying.failed <- json_table[which(json_table$Q1ctime > q),]
-paste("There is/are",nrow(qualifying.failed),"racer who faild in 107% rule in 2016 Season Run 9 (Grand Prix of Austria - July 3, 2016).")
-```
-
-    ## [1] "There is/are 0 racer who faild in 107% rule in 2016 Season Run 9 (Grand Prix of Austria - July 3, 2016)."
-
-Path to the champion - Team
----------------------------
-
-The Constructors Championship was not awarded until 1958. So data from 1950 till now will be collected.
-
-``` r
-# The process will be very slow while kniting the R Markdown file. So I commended the following code and save the data but the evaluation will be silenced.
+# The process will be very slow while knitting the R Markdown file. So I commended the following code and save the data but the evaluation will be silenced.
 
 finalTable <- data.frame()
 htmlTable <- data.frame()
@@ -207,6 +147,35 @@ write.csv(finalTable,"F1_team.csv")
 
 finalTable <- read.csv(file="https://raw.githubusercontent.com/YunMai-SPS/DA607/master/DA607_final%20project/F1_team.csv", header=TRUE, sep=",", stringsAsFactors = F)
 
+kable(head(finalTable,n=10))
+```
+
+|    X|  Pos| Team          |  Pts|  year|
+|----:|----:|:--------------|----:|-----:|
+|    1|    1| Vanwall       |   48|  1958|
+|    2|    2| Ferrari       |   40|  1958|
+|    3|    3| Cooper Climax |   31|  1958|
+|    4|    4| BRM           |   18|  1958|
+|    5|    5| Maserati      |    6|  1958|
+|    6|    6| Lotus Climax  |    3|  1958|
+|    7|    1| Cooper Climax |   40|  1959|
+|    8|    2| Ferrari       |   32|  1959|
+|    9|    3| BRM           |   18|  1959|
+|   10|    4| Lotus Climax  |    5|  1959|
+
+``` r
+kable(tail(finalTable, n=5))
+```
+
+|     |    X|  Pos| Team           |  Pts|  year|
+|-----|----:|----:|:---------------|----:|-----:|
+| 620 |  620|    6| Toro Rosso     |   13|  2017|
+| 621 |  621|    7| Haas Ferrari   |    8|  2017|
+| 622 |  622|    8| Renault        |    6|  2017|
+| 623 |  623|    9| Sauber Ferrari |    0|  2017|
+| 624 |  624|   10| McLaren Honda  |    0|  2017|
+
+``` r
 tally <- as.data.frame(table(finalTable$Team))
 team1 <- tally[which(tally$Freq == 1),]
 team2 <- tally[which(tally$Freq == 2),]
@@ -229,16 +198,19 @@ longlastTeam <- group_by(longlastTeam,Team)
 ggplot(data = longlastTeam, aes(x=year, y=Pos, color = Team, group = Team)) +
     geom_point() +
     geom_line() +
+    labs(y="Position")+
     facet_grid(Team ~ .)
 ```
 
-![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-7-1.png)
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-4-1.png)
+
+Only teams appeared in the top 10 more than 10 years were plotted. As shown in the figure, Ferrari is the only name came all the way from the every beginning in the ~70 years history of F1. It locked No.1 for consecutive five years from 1999 to 2004. All the team with Ford in their names: Brabham Ford, McLaren Ford, and Tyrrell Ford, are active between 1970's and 1990's. But one of them, Brabham Ford, disappeared from 1980's and the rest three disappeared after the middle of 1990's. Right after that, McLaren Mercedes began to show in the top 10 combat. Renault started to enter top 10 since late 1970's and kept progressing towards the first place. It seemed that it had no luck since mid-1980's and did not come back to top 10 till 2000's. The come and go, up and down of these teams reflect the changes of automobile companies, such as mergers and acquisitions. Ford haven't come back to top 10 after 1990's.
 
 Path to the champion - Driver
 -----------------------------
 
 ``` r
-# The process will be held while kniting the R Markdown file. So I commended the following code and save the data but the evaluation will be silenced.
+# The process will be held while knitting the R Markdown file. So I commended the following code and save the data but the evaluation will be silenced.
 
 driverTable <- data.frame()
 htmlTable <- data.frame()
@@ -311,12 +283,17 @@ d50.top3 <- group_by(d50.top3,Name)
 ggplot(data = d50.top3, aes(x=year, y=Pos, color = Name, group = Name)) +
     geom_point() +
     geom_line() +
+    labs(y="Position")+
     facet_grid(Name ~ .)
 ```
 
-![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-9-1.png)
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-6-1.png)
+
+Drivers who entered From the figure we know that Juan Manuel Fangio Déramo is the most successful racing car driver in 1950's. He won 5 first place in 10 years.
 
 **Get familiar with the 90', 00' and 10' racers**
+
+Some 90's F1 stars are still active in the race. So I decided to know the famous drivers from 1990 till now.
 
 ``` r
 driverTable10$Driver <-str_replace_all(driverTable10$Driver,"[:space:]?\n[:space:]+", " ")
@@ -326,15 +303,15 @@ driverTable10 <- transform(driverTable10, Name = paste(FirstName,LastName, sep =
 
 drivertally10 <- as.data.frame(table(driverTable10$Name))
 colnames(drivertally10) <- c("Name","Freq")
-d10.1 <- drivertally10[which(drivertally50$Freq == max(drivertally10$Freq)),]
-d10.2 <- drivertally10[which(drivertally50$Freq == (max(drivertally10$Freq)-1)),]
-d10.3 <- drivertally10[which(drivertally50$Freq == (max(drivertally10$Freq)-2)),]
+d10.1 <- drivertally10[which(drivertally10$Freq == max(drivertally10$Freq)),]
+d10.2 <- drivertally10[which(drivertally10$Freq == (max(drivertally10$Freq)-1)),]
+d10.3 <- drivertally10[which(drivertally10$Freq == (max(drivertally10$Freq)-2)),]
 d10.top3.tally <- rbind(d10.1,d10.2,d10.3)
 
 sort(d10.top3.tally$Freq, decreasing = T)  
 ```
 
-    ## [1] 7 3 2
+    ##  [1] 8 8 8 8 7 7 7 7 7 6 6
 
 ``` r
 d10.top3.name <- as.character(d10.top3.tally$Name)
@@ -342,32 +319,48 @@ d10.top3.name <- as.character(d10.top3.tally$Name)
 length(d10.top3.name)
 ```
 
-    ## [1] 8
+    ## [1] 11
 
 ``` r
 driverTable10$Name <-as.character(driverTable10$Name)
 
-d10.top3 <- driverTable50[which(driverTable50$Name == d50.top3.name[1] | driverTable50$Name == d50.top3.name[2] | driverTable50$Name == d50.top3.name[3] | driverTable50$Name == d50.top3.name[4] | driverTable50$Name == d50.top3.name[5] | driverTable50$Name == d50.top3.name[6] | driverTable50$Name == d50.top3.name[7] | driverTable50$Name == d50.top3.name[8]),]
+d10.top3 <- driverTable10[which(driverTable10$Name == d10.top3.name[1] | driverTable10$Name == d10.top3.name[2] | driverTable10$Name == d10.top3.name[3] | driverTable10$Name == d10.top3.name[4] | driverTable10$Name == d50.top3.name[5] | driverTable10$Name == d10.top3.name[6] | driverTable10$Name == d10.top3.name[7] | driverTable10$Name == d10.top3.name[8]),]
 
-d50.top3 <- group_by(d50.top3,Name)
+d10.top3 <- group_by(d10.top3,Name)
  
-ggplot(data = d50.top3, aes(x=year, y=Pos, color = Name, group = Name)) +
+ggplot(data = d10.top3, aes(x=year, y=Pos, color = Name, group = Name)) +
     geom_point() +
     geom_line() +
+    labs(y="Position")+
     facet_grid(Name ~ .)
 ```
 
-![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-10-1.png)
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-7-1.png)
 
-Practice and Qulifying
-----------------------
+It would be too much to show all drivers who entered top 10 in recent 7 years. Drivers frequently appeared in the top 10 list were selected to show. From the figure we can see that Sebastian Vettel was the champion in the 4 consecutive years from 2010 to 2013. Lewis Hamilton was the No.1 in 2014 and 2015. Hamilton's team mate Nico Rosberg was the 2016 champion.
 
-**Since 2006, three practice sessions are held before the Grand Prix race; the first on Friday morning and the second on Friday afternoon(Thursday at Monaco). Both sessions last one and a half hours. While individual practice sessions are not compulsory, a driver must take part in at least one practice session to be eligible for the race. Teams use practise time to work on car set-upin preparation for qualifying and the race.**
+Grand Prix of Australia, July 2016
+==================================
+
+**In this project, I took data from Grand Prix of Australia in July 2016 to see how we can use the numbers to tell the stories happened in this particular season and particular run of the game. The reports included three parts: practice, qualifying, and racing.**
+
+Practice and Qualifying
+-----------------------
+
+**Practice**
+
+Since 2006, three practice sessions are held before the Grand Prix race; the first on Friday morning and the second on Friday afternoon(Thursday at Monaco). Both sessions last one and a half hours. While individual practice sessions are not compulsory, a driver must take part in at least one practice session to be eligible for the race. Teams use practice time to work on car set-up in preparation for qualifying and the race.
+
+To view how each racer uses the practice time, timing sheet contents in PDF from FIA (<http://www.fia.com/f1-archives>) were extract through <https://pdftables.com/> and converted to a tab-delimited text file. A hunderdth second can make the difference to the race results. The crucial data, millisecond, in three decimal places could be preserved in a tab-delimited text file.
+
+While I learned how to read timing sheet, I found one very interesting blog of Joe Saward, who is a long-time F1 journalist. Joe Saward talked about how F1 journalist did lap charts in one of his articles, Lap Charts.(Joe Saward, JOEBLOGF1, April 14, 2011, <https://joesaward.wordpress.com/2011/04/14/lap-charts/>). Lap charters develop their own marks to record the action on a given lap. For example, in Joe Saward's charts, an arrow indicates a car is catching the one in front, two lines indicate a battle, circled number indicates pit stop, small horizontal lines between numbers indicates the gap, and a circular arrow indicates a spin etc.
+
+Now we can use R language to mark the lap chart.
+
+![The lap chart of 2011 Malaysian Grand Prix done by F1 journalist. (Joe Saward, JOEBLOGF1,April 14, 2011, <https://joesaward.wordpress.com/2011/04/14/lap-charts/>)](https://raw.githubusercontent.com/YunMai-SPS/DA607/master/DA607_final%20project/lap-chart.jpg)
 
 ``` r
 # Grand Prix of Austrlia, July 2016, First Practice: AuJy.p1
-
-# timing sheet contents in PDF from FIA were extract through https://pdftables.com/ and converted to a tab-delimited text file. Hunderdth second can make the difference to the race results. The crucial data, milisecond, in three desimal place could be preserved in a tab-delimited text file.
 
 AuJy.p1 <- read.table("https://raw.githubusercontent.com/YunMai-SPS/DA607/master/DA607_final%20project/practice_lap_times_55_raw%20-%20Copy.txt",fill = TRUE)
 colnames(AuJy.p1) <- c("lapNo","pit","time","No","Name","V6","V7")
@@ -481,10 +474,25 @@ kable(head(AuJy.p1,n=5))
 ggplot(data = AuJy.p1, aes(x=cumtime, y=Name, color = Name, group = Name)) +
     geom_point() +
     geom_line() +
-    geom_point(data=AuJy.p1[which(AuJy.p1$pit == 1), ], aes(x=cumtime, y=Name),color="black",pch = 1,size = 1.7)
+    geom_point(data=AuJy.p1[which(AuJy.p1$pit == 1), ], aes(x=cumtime, y=Name),color="black",pch = 1,size = 1.7)+
+  labs( title="Practice 1")
 ```
 
-![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-11-1.png)
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-8-1.png)
+
+The time between two dots indicates the time of completion of one lap. It could be lap time or lap time plus pit stop time. The lap chart shows how each driver completea each lap and utilize the practice time.
+
+The sessions in which the driver stopped in the pit were marked by a black circle.
+
+**Qualifying**
+
+Saturday's qualifying session, designed to take about an hour, is split into three distinct segments - Q1, Q2 and Q3.\*\*
+
+Q1: Lasts for 18 minutes, at the end of which time the six slowest drivers are eliminated from qualifying and 16 advance to Q2.
+
+Q2: After a short break, the times are reset and the 16 remaining cars run in a 15-minute session, at the end of which the slowest six are eliminated from qualifying, leaving 10 to progress to Q3.
+
+Q3: After a further break, the times are reset and a final 12-minute session is held to decide pole position and the starting order for the top ten grid places.
 
 ``` r
 AuJy.qli <- read.table("https://raw.githubusercontent.com/YunMai-SPS/DA607/master/DA607_final%20project/qulifying_lap_time_58_raw.txt",fill=T,row.names=NULL)
@@ -583,12 +591,109 @@ kable(head(AuJy.qli,n=5))
 ggplot(data = AuJy.qli, aes(x=cumtime, y=Name, color = Name, group = Name)) +
     geom_point() +
     geom_line() +
-    geom_point(data=AuJy.qli[which(AuJy.qli$pit == 1), ], aes(x=cumtime, y=Name),color="black",pch = 1,size = 1.7)
+    geom_point(data=AuJy.qli[which(AuJy.qli$pit == 1), ],       aes(x=cumtime, y=Name),color="black",pch = 1,size = 1.7)+
+  labs( title="Qulifying 1")
+```
+
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-9-1.png)
+
+From the qualifying lap chart, we can see some drivers retired before the race finish. All drivers had unaminous pit stop at the similar time in the Australia Grad Prix in July 2016.
+
+``` r
+json_url <- "http://ergast.com/api/f1/2016/9/qualifying.json"
+jsonFile <- getURL(json_url)
+jsonContent <- fromJSON(jsonFile)
+json_table5 <- jsonContent$MRData
+
+json_table6 <-json_table5$RaceTable
+json_table7 <-json_table6$Races
+json_table8 <-json_table7$QualifyingResults
+json_table9 <-json_table8[[1]]
+json_table10 <-json_table9[["Driver"]]
+json_table11 <-json_table9[["Constructor"]]
+json_table9$Driver <- NULL
+json_table9$Constructor <- NULL
+json_table<- cbind(json_table9,json_table10)
+json_table <- cbind(json_table,json_table11)
+json_table <- json_table[,c("number","position", "Q1", "Q2", "Q3", "driverId","permanentNumber", "code", "url", "givenName", "familyName", "dateOfBirth", "nationality", "constructorId", "url", "name", "nationality")]
+json_table$permanentNumber <- NULL
+kable(head(json_table,n=10))
+```
+
+| number | position | Q1       | Q2       | Q3       | driverId        | code | url                                                     | givenName | familyName | dateOfBirth | nationality | constructorId | url.1                                                   | name        | nationality.1 |
+|:-------|:---------|:---------|:---------|:---------|:----------------|:-----|:--------------------------------------------------------|:----------|:-----------|:------------|:------------|:--------------|:--------------------------------------------------------|:------------|:--------------|
+| 44     | 1        | 1:06.947 | 1:06.228 | 1:07.922 | hamilton        | HAM  | <http://en.wikipedia.org/wiki/Lewis_Hamilton>           | Lewis     | Hamilton   | 1985-01-07  | British     | mercedes      | <http://en.wikipedia.org/wiki/Lewis_Hamilton>           | Mercedes    | British       |
+| 6      | 2        | 1:06.516 | 1:06.403 | 1:08.465 | rosberg         | ROS  | <http://en.wikipedia.org/wiki/Nico_Rosberg>             | Nico      | Rosberg    | 1985-06-27  | German      | mercedes      | <http://en.wikipedia.org/wiki/Nico_Rosberg>             | Mercedes    | German        |
+| 27     | 3        | 1:07.385 | 1:07.257 | 1:09.285 | hulkenberg      | HUL  | <http://en.wikipedia.org/wiki/Nico_H%C3%BClkenberg>     | Nico      | Hülkenberg | 1987-08-19  | German      | force\_india  | <http://en.wikipedia.org/wiki/Nico_H%C3%BClkenberg>     | Force India | German        |
+| 5      | 4        | 1:06.761 | 1:06.602 | 1:09.781 | vettel          | VET  | <http://en.wikipedia.org/wiki/Sebastian_Vettel>         | Sebastian | Vettel     | 1987-07-03  | German      | ferrari       | <http://en.wikipedia.org/wiki/Sebastian_Vettel>         | Ferrari     | German        |
+| 22     | 5        | 1:07.653 | 1:07.572 | 1:09.900 | button          | BUT  | <http://en.wikipedia.org/wiki/Jenson_Button>            | Jenson    | Button     | 1980-01-19  | British     | mclaren       | <http://en.wikipedia.org/wiki/Jenson_Button>            | McLaren     | British       |
+| 7      | 6        | 1:07.240 | 1:06.940 | 1:09.901 | raikkonen       | RAI  | <http://en.wikipedia.org/wiki/Kimi_R%C3%A4ikk%C3%B6nen> | Kimi      | Räikkönen  | 1979-10-17  | Finnish     | ferrari       | <http://en.wikipedia.org/wiki/Kimi_R%C3%A4ikk%C3%B6nen> | Ferrari     | Finnish       |
+| 3      | 7        | 1:07.500 | 1:06.840 | 1:09.980 | ricciardo       | RIC  | <http://en.wikipedia.org/wiki/Daniel_Ricciardo>         | Daniel    | Ricciardo  | 1989-07-01  | Australian  | red\_bull     | <http://en.wikipedia.org/wiki/Daniel_Ricciardo>         | Red Bull    | Australian    |
+| 77     | 8        | 1:07.148 | 1:06.911 | 1:10.440 | bottas          | BOT  | <http://en.wikipedia.org/wiki/Valtteri_Bottas>          | Valtteri  | Bottas     | 1989-08-29  | Finnish     | williams      | <http://en.wikipedia.org/wiki/Valtteri_Bottas>          | Williams    | Finnish       |
+| 33     | 9        | 1:07.131 | 1:06.866 | 1:11.153 | max\_verstappen | VER  | <http://en.wikipedia.org/wiki/Max_Verstappen>           | Max       | Verstappen | 1997-09-30  | Dutch       | red\_bull     | <http://en.wikipedia.org/wiki/Max_Verstappen>           | Red Bull    | Dutch         |
+| 19     | 10       | 1:07.419 | 1:07.145 | 1:11.977 | massa           | MAS  | <http://en.wikipedia.org/wiki/Felipe_Massa>             | Felipe    | Massa      | 1981-04-25  | Brazilian   | williams      | <http://en.wikipedia.org/wiki/Felipe_Massa>             | Williams    | Brazilian     |
+
+``` r
+#convert qualifying time Q1 time to seconds and annotated as "ctime"
+json_table$Q1m <- as.numeric(str_extract(json_table$Q1,"\\d+"))
+
+json_table$Q1s <- str_extract(json_table$Q1,":\\d+.")
+json_table$Q1s <- as.numeric(str_extract(json_table$Q1s,"\\d+"))
+
+json_table$Q1ms <- str_extract(json_table$Q1, "\\.\\d+")
+json_table$Q1ms <- as.numeric(str_extract(json_table$Q1ms,"\\d+")) 
+  
+json_table$Q1ctime <- json_table$Q1m * 60 + json_table$Q1s +(json_table$Q1ms)/1000
+
+#convert qualifying time Q2 time to seconds and annotated as "ctime"
+json_table$Q2m <- as.numeric(str_extract(json_table$Q2,"\\d+"))
+
+json_table$Q2s <- str_extract(json_table$Q2,":\\d+.")
+json_table$Q2s <- as.numeric(str_extract(json_table$Q2s,"\\d+"))
+
+json_table$Q2ms <- str_extract(json_table$Q2, "\\.\\d+")
+json_table$Q2ms <- as.numeric(str_extract(json_table$Q2ms,"\\d+")) 
+  
+json_table$Q2ctime <- json_table$Q2m * 60 + json_table$Q2s +(json_table$Q2ms)/1000
+
+#convert qualifying time Q3 time to seconds and annotated as "ctime"
+json_table$Q3m <- as.numeric(str_extract(json_table$Q3,"\\d+"))
+
+json_table$Q3s <- str_extract(json_table$Q3,":\\d+.")
+json_table$Q3s <- as.numeric(str_extract(json_table$Q3s,"\\d+"))
+
+json_table$Q3ms <- str_extract(json_table$Q3, "\\.\\d+")
+json_table$Q3ms <- as.numeric(str_extract(json_table$Q3ms,"\\d+")) 
+  
+json_table$Q3ctime <- json_table$Q3m * 60 + json_table$Q3s +(json_table$Q3ms)/1000
+```
+
+``` r
+ggplot(json_table,aes(Q1ctime))+
+  geom_histogram(binwidth = 0.02)+
+  labs(x=" Q1 qualifying time - Grand Prix of Austria July 3, 2016")
 ```
 
 ![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-12-1.png)
 
-"There was a unanimous move to the pits, but a couple of drivers were caught in the worst of the weather, per Formula One: Here comes the rain... ??? It's already caught out Perez and Palmer \#FP2 \#AustrianGP" (RORY MARSDEN, Austrian F1 Grand Prix 2016 Qualifying: Results, Times from Friday's Practice, BleacherReport, JULY 1, 2016)
+Normal distribution of the fast laptime is not anticipated in the F1 qualifying session.
+
+``` r
+summary(json_table$Q1ctime)
+```
+
+    ##    Min. 1st Qu.  Median    Mean 3rd Qu.    Max. 
+    ##   66.52   67.28   67.64   67.58   67.87   68.45
+
+**107% rule:** The 107% rule is a sporting regulation affecting Formula One racing qualifying sessions. During the first phase of qualifying, any driver who fails to set a lap within 107 percent of the fastest time in the first qualifying session will not be allowed to start the race.
+
+``` r
+q <-min(json_table$Q1ctime)*1.07
+qualifying.failed <- json_table[which(json_table$Q1ctime > q),]
+paste("There is/are",nrow(qualifying.failed),"racer who faild in 107% rule in 2016 Season Run 9 (Grand Prix of Austria - July 3, 2016).")
+```
+
+    ## [1] "There is/are 0 racer who faild in 107% rule in 2016 Season Run 9 (Grand Prix of Austria - July 3, 2016)."
 
 Race chart
 ----------
@@ -705,31 +810,63 @@ sorted <- AuJy.race %>%
   arrange(lapNo,rank)
 sorted$No <- as.character(sorted$No)
 
+# plot all the drivers
 ggplot(data = sorted, aes(x=lapNo, y=rank, color = No, group=No)) +
     geom_point() +
-    geom_line() 
+    geom_line() +
+    scale_y_reverse()
 ```
 
-![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-14-1.png)
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-16-1.png)
+
+The race chart tells us the changes of the position of each driver during the race.
 
 ``` r
-ggplot(data = subset(sorted,No == 44 | No == 6), aes(x=lapNo, y=rank, color = No, group=No)) +
+# plot the 5 start at the close position  
+ggplot(data = subset(sorted,No == 44 | No == 7 | No == 3 | No == 6 | No == 33), aes(x=lapNo, y=rank, color = No, group=No)) +
     geom_point() +
     geom_line() +
-    scale_x_continuous(breaks=seq(1,72,4))+
-    scale_y_continuous(breaks=c(1,26,1))
+    scale_x_continuous(breaks=seq(0,72, by = 4))+
+    scale_y_continuous(breaks=seq(0,15, by = 1))+
+    scale_y_reverse()
 ```
 
-![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-14-2.png)
+    ## Scale for 'y' is already present. Adding another scale for 'y', which
+    ## will replace the existing scale.
 
-Here is the strory of competetion between Rosburg (car No. 6) and Hamilton (car No. 44) at the last lap:<http://www.telegraph.co.uk/formula-1/2016/07/03/austrian-grand-prix-2016-f1-live/>.
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-17-1.png)
 
-"Daniel Johnson reports on the post-drama fallout in Austria:Mercedes have slammed the "brainless" last-lap crash in the Austrian Grand Prix which has left Nico Rosberg under investigation by the stewards after he collided with Lewis Hamilton. Hamilton won the race, passing his team-mate on the final lap, but Rosberg broke his front wing and toured round to finish fourth. The gap in the drivers' championship is down to 11 points."
+``` r
+ggplot(data = subset(sorted,No == 44 | No == 6 ), aes(x=lapNo, y=rank, color = No, group=No)) +
+    geom_point() +
+    geom_line() +
+    scale_x_continuous(breaks=seq(0,72, by = 4))+
+    scale_y_continuous(breaks=seq(0,15, by = 1))+
+    scale_y_reverse()
+```
+
+    ## Scale for 'y' is already present. Adding another scale for 'y', which
+    ## will replace the existing scale.
+
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-17-2.png)
+
+Above is a race chart for Australia Grand Prix in July 2016. The horizontal axis is lap number, and the vertical axis shows the position of each car.The performance of each car can be seen in the lines running from left to right. The sudden drops in the lines are due to pitstops.
+
+Lewis Hamilton's car No.44 Nico Erik Rosberg's car No.6 Max Verstappen's car No.33 Daniel Ricciardo's car No.3 Kimi Räikkönen's car No.7
+
+From the above two figures, we can see how Hamilton and Rosberg fought for the championship. And you may wonder why positions of Hamilton and Rosberg changed on the last lap. The story was Hamilton and Rosberg crash on the final lap.
+
+Hamilton was the pole sitter. Rosberg, starting fifth, made good progress. They made their way past Verstappen (No.6), fought out many laps with Rosberg in ahead of Hamilton. Rosberg was criticised and penalized for the collision because he only beginning to apply full lock - or much steering at all - after he ploughed into the side of Hamilton, ruining his front wing and end up as No. 4th.
+
+Here is the story of competetition between Rosburg and Hamilton at the last lap: <http://www.telegraph.co.uk/formula-1/2016/07/03/austrian-grand-prix-2016-f1-live/>.
+
+![Hamilton and Rosberg crash on the final lap before the British driver secured a dramatic win. CREDIT: F1](https://raw.githubusercontent.com/YunMai-SPS/DA607/master/DA607_final%20project/HAM_ROS_crash_2016Aus.jpg)
 
 Reproduce the fight for the lead
 --------------------------------
 
 ``` r
+#calculate the gap between each car and the fastest car in each lap. There are gap records in the history chart from FIA but the gap time when the car it pit are not shown in the sheet. The missing number could be derived from the laptime.
 a <- data.frame(sorted)
 a <- mutate(a, calgap=0)
 k <- 1
@@ -756,23 +893,43 @@ ggplot(data = a, aes(x=lapNo, y=diff, color = No, group=No)) +
     geom_line() 
 ```
 
-![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-15-1.png)
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-18-1.png)
+
+There is no way to see the difference clearly when plotting the gap of all drivers together as in the above figure.
 
 ``` r
-ggplot(data = subset(a,No == 44 | No == 33 | No == 7 | No == 6 | No == 3), aes(x=lapNo, y=diff, color = No, group=No)) +
+#plot the first 5 drivers at the start standing (No.27 retired at lap 67 according to the race chart above so he was not picked for this graph)
+ggplot(data = subset(a, No == 44 | No == 22 | No == 7 | No == 6 | No == 3 | No==33), aes(x=lapNo, y=diff, color = No, group=No)) +
     geom_point() +
-    geom_line() 
+    geom_line()+
+    scale_x_continuous(breaks=seq(0,72, by = 4))+
+    labs(y="Gap")
 ```
 
-![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-15-2.png)
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-19-1.png)
 
-**Saturday's qualifying session, designed to take about an hour, is split into three distinct segments - Q1, Q2 and Q3.**
+Above is a race history chart for Australia Grand Prix in July 2016. The horizontal axis is lap number, and the vertical axis shows the time each car is behind the race time of the reference, the fastest car.
 
-**Q1: Lasts for 18 minutes, at the end of which time the six slowest drivers are eliminated from qualifying and 16 advance to Q2.**
+From the race history chart above we could see the performance of the first six cars in the race, which the shift of the lines up and down the graph. The performance of each car can be seen in the lines running from left to right. The sudden drops in the lines are due to the time lost in pit stops.
 
-**Q2: After a short break, the times are reset and the 16 remaining cars run in a 15-minute session, at the end of which the slowest six are eliminated from qualifying, leaving 10 to progress to Q3. **
+Lewis Hamilton's car No.44 Nico Erik Rosberg's car No.6 Max Verstappen's car No.33 Daniel Ricciardo's car No.3 Kimi Räikkönen's car No.7 Jenson Button's car No.22
 
-**Q3: After a further break, the times are reset and a final 12-minute session is held to decide pole position and the starting order for the top ten grid places.**
+We can see Hamilton pulling away at the front closely followed by Räikkönen, Rosberg might entering the pit and soon catching up and leading the race. We also see Verstappen and Ricciardo battling, Räikkönen joining their battle after lap 33. While Button was far behind from the beginning. They all went to pit at lap 64. In the final stint we knew that Hamilton and Rosberg had collision and Hamilton secured the win but Rosberg ended at 4th with 16.710s behind the champion.
+
+``` r
+b <- a[which(a$lapNo==71 & a$No==44),]
+c <- a[which(a$lapNo==71 & a$No==6),]
+d <- rbind(b,c)
+kable(d)
+```
+
+|      |  lapNo| No  | gap    | time     |  minute|  second|  milisecond|  timeinsecond|   cumtime|  rank|  calgap|    diff|
+|------|------:|:----|:-------|:---------|-------:|-------:|-----------:|-------------:|---------:|-----:|-------:|-------:|
+| 1400 |     71| 44  | 0      | 1:13.030 |       1|      13|          30|        73.030|  5258.107|     1|    0.00|    0.00|
+| 1403 |     71| 6   | 16.710 | 1:30.339 |       1|      30|         339|        90.339|  5274.817|     4|   16.71|  -16.71|
+
+Most Successful Formula 1 Drivers in the past decades
+=====================================================
 
 ``` r
 #The 1st of the Championship in 2006
@@ -899,8 +1056,7 @@ kable(head(json_table.results2,n=2))
 | 2006 | 5      | 2        | 8      | michael\_schumacher | 2    | 38  | kph   | 210.576 |
 | 2006 | 1      | 2        | 8      | alonso              | 1    | 45  | kph   | 210.487 |
 
-To be concise, the code, similar to above two chunks, for collecting race results from 2007 to 2016 will be hide but the only the data was shown here.
-======================================================================================================================================================
+To be concise, the code, similar to above two chunks, for collecting race results from 2007 to 2016 will be hide but the only the data was shown here.\#
 
 | year | number | position | points | name      | rank | lap | units | speed   |
 |:-----|:-------|:---------|:-------|:----------|:-----|:----|:------|:--------|
@@ -1028,7 +1184,18 @@ ggplot(data=a, aes(x=name, y=counts, fill=position)) +
 
     ## Warning: Removed 11 rows containing missing values (geom_bar).
 
-![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-36-1.png)
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-41-1.png)
+
+``` r
+ggplot(championship,aes(x=name,y=speed),group=name)+
+  geom_boxplot()+
+  labs(y=" Speed",title="speed")+
+  theme(axis.text.x=element_text(angle=90,hjust=1,vjust=0.5))
+```
+
+![](Final_Prjt_F1_files/figure-markdown_github/unnamed-chunk-42-1.png)
+
+From the boxplot, we can see that not all the driver's speed distribution is normal. The distributions of speed of the four famous champions are normal and the medium is around 200 kph.Fisichella had the highest medium of speed.
 
 ``` r
 famous <- a[which(a$counts > 20 ),]
@@ -1045,6 +1212,33 @@ kable(famous)
 | rosberg  | first    |      23|
 | vettel   | first    |      30|
 
-\*\*The racer who won most championship in the past 10 years are Lewis Hamilton, who got first place for 45 times. The second sucessful racer is Sebastian Vettel, who won 30 times. Nico Erik Rosberg and Fernando Alonso Díaz are tie as they both won 23 times. (results could be not vary as 2011 results were not collected because of the technical issue.)
+The racer who won the most championship in the past 10 years is Lewis Hamilton, who got first place for 45 times. The second successful racer is Sebastian Vettel, who won 30 times. There is a tie between Nico Erik Rosberg and Fernando Alonso Díaz as they both won 23 times. (results could be varied as 2011 results were not collected because of the technical issue.)
 
-When the champion did not make the first place, they were very close to the first place. It is easy to understand that Hamilton, Rosberg and Alonso won the most second place among all the racers who fight for the same place in the past 10 years.\*\*
+When the champion did not make the first place, they were very close to the first place. It is easy to understand that Hamilton, Rosberg, and Alonso won the most second place among all the racers who fight for the same place in the past 10 years.
+
+Conclusion and Discussion:
+--------------------------
+
+1.Ferrari is a team came in top 10 from the every beginning of the 70-years history of F1.
+
+2.Sebastian Vettel and Lewis Hamilton are the two people won championships from 2010 to 2016.
+
+3.Timing sheet data could be used to present the practice time utilization. From the session utilization chart, it seems all the participants use the time to set up their cars.
+
+4.Qulifying chart could be used to view which drivers are eliminated from Q1 and Q2.
+
+5.The race chart tells us the changes of the position of each driver during the race. The race history chart based on gap time tells us the combat of the cars.
+
+6.The racer who won the most championship in the past 10 years is Lewis Hamilton, who got first place for 45 times.And Sebastian Vettel, ,Nico Erik Rosberg, and Fernando Alonso Díaz are also famous racer as they won more than 20 championships.
+
+7.The average speed of the four famous champion are about the same, around 200 kph. This suggests that being stable is the key for the champion.
+
+7.Technically, there are different resources to collecting data and they are in different format. The results of analyze or the model will vary when you use different strategies to filter data.
+
+8.I used PDFtable to extract data from PDF to store as .txt or .csv file, which is a feature that we did not cover in class.
+
+**Reference:**
+
+*1. Tony Hirst, Wrangling F1 Data With R - Leanpub.(The lap utilization chart idea in this project comes from Tony's book. Also The book introduce useful data resources, F1 knowledge and analysis methods.)*
+
+\*2.Joe Saward,Lap charts,<https://joesaward.wordpress.com/2011/04/14/lap-charts/*>
